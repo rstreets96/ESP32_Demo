@@ -1,41 +1,33 @@
-#include <stdio.h>
-#include <stdbool.h>
-#include <unistd.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "led_strip.h"
+/*
+ * Application Entry Point
+ */
+
+#include "nvs_flash.h"
+
+#include "wifi_app.h"
 #include "rgb_led.h"
 
 
-
-
-
+led_strip_t ledStrip;
 
 
 void app_main(void)
 {
-	led_strip_install();
-	static led_strip_t strip =
+	// Initialize NVS
+	esp_err_t ret = nvs_flash_init();
+	if(ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
 	{
-			.type = LED_STRIP_WS2812,
-			.length = 1,
-			.gpio = RGB_LED_GPIO,
-			.buf = NULL,
-			.brightness = 50
-	};
+		ESP_ERROR_CHECK(nvs_flash_erase());
+		ret = nvs_flash_init();
+	}
+	ESP_ERROR_CHECK(ret);
 
-	ESP_ERROR_CHECK(led_strip_init(&strip));
+	//global LED strip object to represent on-board RGB LED
+	ledStrip = initLedStrip();
+
+	// Start WiFi
+	wifi_app_start();
 
 
 
-    while (true) {
-        setLED(&strip, blue);
-        sleep(1);
-        setLED(&strip, red);
-		sleep(1);
-		setLED(&strip, green);
-		sleep(1);
-		setLED(&strip, LEDoff);
-		sleep(1);
-    }
 }

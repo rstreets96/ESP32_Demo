@@ -11,19 +11,31 @@
 #include "led_strip.h"
 
 //Addressable RGB LED GPIO
-#define RGB_LED_GPIO 48
+#define RGB_LED_GPIO 	48
 
-//Colors for RGB LED
-static rgb_t LEDoff = {.r = 0, .g = 0, .b = 0};
-static rgb_t blue = {.r = 0, .g = 0, .b = 255};
-static rgb_t red = {.r = 255, .g = 0, .b = 0};
-static rgb_t green = {.r = 0, .g = 255, .b = 0};
-static rgb_t pink = {.r = 5, .g = 5, .b = 255};
-static rgb_t yellow = {.r = 5, .g = 5, .b = 255};
-static rgb_t mint = {.r = 5, .g = 5, .b = 255};
 
-//Function
-extern void setLED(led_strip_t *, rgb_t);
+typedef enum
+{
+	APP_STARTED = 0,
+	HTTP_SERVER_STARTED,
+	CONNECTED,
+	DISCONNECTED
+}wifi_status_e;
+
+/*
+ * Function to initialize the LRGB LED strip object
+ * @return: Returns the LEDstrip object
+ */
+led_strip_t initLedStrip(void);
+
+/*
+* Function to set LED Color to indicate WiFi Status
+* @params:	ledStrip	  	pointer to the led strip object
+* 			status			Choose value from the wifi_status_e enum to be indicated
+*/
+
+void setLEDWifiStatus(wifi_status_e status);
+
 
 
 #endif /* MAIN_RGB_LED_H_ */
