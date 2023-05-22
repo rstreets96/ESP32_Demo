@@ -28,6 +28,4 @@ void app_main(void)
 	// Start WiFi
 	wifi_app_start();
 
-
-
 }

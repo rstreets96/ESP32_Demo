@@ -17,6 +17,7 @@
 #include "rgb_led.h"
 #include "tasks_common.h"
 #include "wifi_app.h"
+#include "http_server.h"
 
 // Tag used for ESP serial console messages
 static const char TAG[] = "wifi_app";
@@ -85,7 +86,7 @@ static void wifi_app_event_handler(void *arg, esp_event_base_t event_base, int32
 /*
  * Initializes the WiFi application event handler for WiFi and IP events
  */
-static void wifi_app_event_handler_init()
+static void wifi_app_event_handler_init(void)
 {
 	// Event loop for the WiFi driver
 	ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -122,16 +123,16 @@ static void wifi_app_soft_ap_config(void)
 	// SoftAP - WiFi access point configuration
 	wifi_config_t ap_config =
 	{
-			.ap = {
-					.ssid = WIFI_AP_SSID,
-					.ssid_len = strlen(WIFI_AP_SSID),
-					.password = WIFI_AP_PASSWORD,
-					.channel = WIFI_AP_CHANNEL,
-					.ssid_hidden = WIFI_AP_SSID_HIDDEN,
-					.authmode = WIFI_AUTH_WPA2_PSK,
-					.max_connection = WIFI_AP_MAX_CONNECTIONS,
-					.beacon_interval = WIFI_AP_BEACON_INTERVAL,
-			},
+		.ap = {
+				.ssid = WIFI_AP_SSID,
+				.ssid_len = strlen(WIFI_AP_SSID),
+				.password = WIFI_AP_PASSWORD,
+				.channel = WIFI_AP_CHANNEL,
+				.ssid_hidden = WIFI_AP_SSID_HIDDEN,
+				.authmode = WIFI_AUTH_WPA2_PSK,
+				.max_connection = WIFI_AP_MAX_CONNECTIONS,
+				.beacon_interval = WIFI_AP_BEACON_INTERVAL,
+		},
 	};
 
 	// Configure DHCP for the AP
@@ -147,7 +148,7 @@ static void wifi_app_soft_ap_config(void)
 
 	ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));							//Setting the mode as Access Point/Station Mode
 	ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, &ap_config));				//Set our configuration
-	ESP_ERROR_CHECK(esp_wifi_set_bandwidth(ESP_IF_WIFI_AP, WIFI_AP_BANDWIDTH));		//Setting our 20MHz bandwidth
+	ESP_ERROR_CHECK(esp_wifi_set_bandwidth(WIFI_IF_AP, WIFI_AP_BANDWIDTH));		//Setting our 20MHz bandwidth
 	ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_STA_POWER_SAVE));							//Setting our power save to none
 }
 
@@ -184,7 +185,7 @@ static void wifi_app_task(void *pvParameters)
 				case WIFI_APP_MSG_START_HTTP_SERVER:
 					ESP_LOGI(TAG, "WIFI_APP_MSG_START_HTTP_SERVER");
 
-					//http_server_start();
+					http_server_start();
 					setLEDWifiStatus(HTTP_SERVER_STARTED);
 
 					break;
@@ -222,7 +223,7 @@ void wifi_app_start(void)
 	setLEDWifiStatus(APP_STARTED);
 
 	//Disable default WiFi logging messages
-	esp_log_level_set("wifi", ESP_LOG_NONE);
+	esp_log_level_set("wifi", ESP_LOG_ERROR);
 
 	//create message queue
 	wifi_app_queue_handle = xQueueCreate(3, sizeof(wifi_app_queue_message_t));
